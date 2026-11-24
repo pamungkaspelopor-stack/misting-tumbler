@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rekap Misting & Tumbler Siswa — Terkunci per Wali Kelas (31 Kelas)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            'soft': '0 10px 30px -10px rgba(15, 23, 42, 0.08)',
+            'glow': '0 0 25px rgba(79, 70, 229, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 45%, #ecfdf5 100%);
+      min-height: 100vh;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+    }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in {
+      animation: fadeSlideIn 0.25s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-indigo-600 selection:text-white">
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- HEADER & TOP NAVIGATION -->
+  <header class="sticky top-0 z-30 bg-gradient-to-r from-indigo-700 via-blue-700 to-teal-600 text-white shadow-lg border-b border-white/15">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5">
+        <!-- Brand & Status -->
+        <div class="flex items-start sm:items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+            🍱
+          </div>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400/20 text-amber-200 border border-amber-300/30">
+                🏫 SDN 190 Cisaranten Kidul • 31 Kelas
+              </span>
+              <span id="syncStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-400/20 text-emerald-100 border border-emerald-300/30">
+                <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                <span id="syncText">Lokal & Antar-Tab Aktif</span>
+              </span>
+            </div>
+            <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-white mt-1 leading-snug">
+              Rekap Misting & Tumbler Siswa — Terkunci per Wali Kelas (31 Kelas)
+            </h1>
+          </div>
+        </div>
+
+        <!-- Navigation & Actions -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="openCloudModal()" id="btnCloudRoom"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/25 transition shadow-sm">
+            <span>☁️ Ruang:</span>
+            <span id="headerRoomLabel" class="font-mono font-bold text-amber-200 max-w-[135px] truncate">sdn190-misting-2026</span>
+          </button>
+
+          <div class="inline-flex rounded-xl bg-slate-900/25 p-1 border border-white/15">
+            <button type="button" id="navTeacher" onclick="switchMainView('teacher')"
+              class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-white text-indigo-700 shadow">
+              👩‍🏫 Form Wali Kelas
+            </button>
+            <button type="button" id="navAdmin" onclick="switchMainView('admin')"
+              class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-white/90 hover:text-white">
+              🛡️ Admin Panitia
+            </button>
+          </div>
+
+          <button type="button" onclick="downloadHtmlFile()"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition shadow-sm">
+            <span>⬇️ Download (.HTML)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ========================================================= -->
+    <!-- HALAMAN 1: FORM WALI KELAS                                -->
+    <!-- ========================================================= -->
+    <section id="viewTeacher" class="space-y-6 animate-in">
+
+      <!-- Bar Tanggal & Ringkasan Harian -->
+      <div class="glass-card rounded-2xl p-4 sm:p-5 shadow-soft">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-3">
+            <div>
+              <label for="teacherDateInput" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                Pilih Tanggal:
+              </label>
+              <div class="flex flex-wrap items-center gap-2">
+                <input type="date" id="teacherDateInput"
+                  class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-sm" />
+                <button type="button" onclick="setTeacherDateToday()"
+                  class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs sm:text-sm font-bold transition">
+                  📅 Kembali ke Hari Ini
+                </button>
+              </div>
+            </div>
+            <div class="h-10 w-px bg-slate-200 hidden sm:block"></div>
+            <div>
+              <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Tanggal Terpilih</span>
+              <p id="teacherDateFormatted" class="text-sm sm:text-base font-extrabold text-indigo-950">-</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-4 py-3 rounded-2xl shadow-md">
+            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-xl font-bold">
+              📊
+            </div>
+            <div>
+              <div class="text-xs font-semibold text-indigo-100">Progres Pengisian Harian</div>
+              <div id="teacherFilledCounter" class="text-lg sm:text-xl font-extrabold tracking-tight">0 / 31 Kelas Terisi</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legenda Status -->
+        <div class="mt-4 pt-3.5 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="inline-flex items-center gap-1.5 font-semibold">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span> Sudah Mengisi
+            </span>
+            <span class="inline-flex items-center gap-1.5 font-semibold">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-300 ring-2 ring-slate-100"></span> Belum Mengisi
+            </span>
+            <span class="inline-flex items-center gap-1.5 font-semibold">
+              <span>🔒</span> Terkunci (Klik kelas untuk verifikasi nama wali kelas)
+            </span>
+            <span class="inline-flex items-center gap-1.5 font-semibold text-indigo-700">
+              <span>🔓</span> Terbuka
+            </span>
+          </div>
+          <div class="text-slate-500 font-medium">
+            Periode Program: <strong class="text-slate-700">23 Nov 2026 – 4 Des 2026</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid 31 Tombol Kelas (1A - 6E) -->
+      <div class="glass-card rounded-2xl p-4 sm:p-6 shadow-soft space-y-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">Pilih Kelas Anda (31 Rombel)</h2>
+            <p class="text-xs sm:text-sm text-slate-500">Klik tombol kelas untuk membuka kunci dengan mengetikkan nama wali kelas.</p>
+          </div>
+        </div>
+
+        <div id="classGridContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <!-- Dirender oleh JS per tingkat 1..6 -->
+        </div>
+      </div>
+
+      <!-- KARTU KUNCI WALI KELAS (MUNCUL SAAT KELAS DIKLIK & BELUM TERBUKA) -->
+      <div id="lockCardSection" class="hidden animate-in">
+        <div class="max-w-xl mx-auto glass-card rounded-3xl p-6 sm:p-8 shadow-xl border-2 border-indigo-200 relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500"></div>
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-2xl font-bold shrink-0">
+                🔐
+              </div>
+              <div>
+                <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-indigo-100 text-indigo-700 mb-1">
+                  Verifikasi Wali Kelas
+                </span>
+                <h3 class="text-xl font-extrabold text-slate-900">
+                  Buka Kunci Kelas <span id="lockTargetClass" class="text-indigo-600">1A</span>
+                </h3>
+              </div>
+            </div>
+            <button type="button" onclick="closeLockCard()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition" title="Tutup">
+              ✕
+            </button>
+          </div>
+
+          <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+            Ketikkan <strong>nama lengkap wali kelas terdaftar</strong> untuk kelas <strong id="lockTargetClassInline">1A</strong>. Penulisan huruf besar/kecil, tanda baca, dan gelar akademik (seperti <em>S.Pd, S.Pd.I, M.Pd, Gr</em>) otomatis diabaikan.
+          </p>
+
+          <form id="unlockForm" onsubmit="handleUnlockSubmit(event)" class="mt-5 space-y-4">
+            <div>
+              <label for="teacherNameInput" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Nama Wali Kelas Terdaftar
+              </label>
+              <input type="text" id="teacherNameInput" autocomplete="off" placeholder="Contoh: Dadah Sayidah"
+                class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/15 outline-none text-base font-bold text-slate-900 transition" />
+              <p id="unlockErrorMsg" class="hidden mt-2 text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-2 rounded-lg">
+                ❌ Nama tidak sesuai dengan wali kelas terdaftar untuk kelas ini. Silakan periksa kembali ejaan nama Anda.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 pt-1">
+              <button type="submit"
+                class="flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-extrabold text-sm shadow-md hover:shadow-lg transition">
+                🔓 Buka Kunci Kelas
+              </button>
+              <button type="button" onclick="closeLockCard()"
+                class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+                Batal
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- FORM INPUT WALI KELAS (MUNCUL SETELAH KUNCI TERBUKA) -->
+      <div id="teacherFormSection" class="hidden animate-in">
+        <div class="glass-card rounded-3xl shadow-xl border-2 border-emerald-200 overflow-hidden">
+          <!-- Form Header -->
+          <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white px-5 sm:px-7 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl font-extrabold shrink-0">
+                🔓
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-white text-teal-800">
+                    Kelas <span id="formClassBadge">1A</span>
+                  </span>
+                  <span id="formSavedStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-300 text-slate-900">
+                    Belum Tersimpan pada Tanggal Ini
+                  </span>
+                </div>
+                <h3 id="formTeacherName" class="text-lg sm:text-xl font-extrabold mt-1">Nama Wali Kelas</h3>
+                <p id="formDateSubtitle" class="text-xs text-teal-100 font-medium">Tanggal: -</p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="openHistoryModal()"
+                class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs sm:text-sm font-bold transition">
+                📜 Riwayat Kelas Saya
+              </button>
+              <button type="button" onclick="lockCurrentClass()"
+                class="px-3.5 py-2 rounded-xl bg-slate-900/35 hover:bg-slate-900/50 text-white border border-white/20 text-xs sm:text-sm font-bold transition">
+                🔒 Kunci Kelas
+              </button>
+            </div>
+          </div>
+
+          <!-- Form Body -->
+          <div class="p-5 sm:p-7 space-y-6">
+            <!-- Step 1: Jumlah Anak Keseluruhan -->
+            <div class="bg-indigo-50/70 border border-indigo-200/80 rounded-2xl p-4 sm:p-5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-indigo-700">
+                    <span>Langkah 1 (Wajib)</span>
+                  </div>
+                  <label for="inputTotalStudents" class="block text-base sm:text-lg font-extrabold text-slate-900">
+                    Jumlah Anak Keseluruhan (0 – 35 Siswa)
+                  </label>
+                  <p class="text-xs text-slate-600">
+                    Isi jumlah total siswa aktif/hadir di kelas Anda hari ini (angka <strong>0 sampai 35</strong>) untuk membuka 3 kolom rekapan di bawah.
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-2.5 shrink-0">
+                  <input type="number" id="inputTotalStudents" min="0" max="35" step="1" placeholder="0 - 35"
+                    oninput="handleFormInputChange()"
+                    class="w-32 px-4 py-3 rounded-xl border-2 border-indigo-300 bg-white text-center text-xl font-extrabold text-indigo-950 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/15 outline-none shadow-sm" />
+                  <button type="button" onclick="deleteCurrentClassEntry()" id="btnDeleteEntry"
+                    class="px-3.5 py-3 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 border border-rose-200 text-xs sm:text-sm font-extrabold transition"
+                    title="Hapus data kelas ini pada tanggal terpilih">
+                    🗑️ Hapus
+                  </button>
+                </div>
+              </div>
+              <p id="totalStudentsError" class="hidden mt-2 text-xs font-bold text-rose-600">
+                ⚠️ Masukkan angka bulat yang valid antara 0 hingga 35.
+              </p>
+            </div>
+
+            <!-- Step 2: Tiga Kolom Rekapan -->
+            <div id="recapInputsWrapper" class="space-y-4 transition-opacity">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-extrabold uppercase tracking-wider text-teal-700">Langkah 2</span>
+                  <h4 class="text-base font-extrabold text-slate-900">Input Data Misting & Tumbler Siswa</h4>
+                </div>
+                <span id="inputsLockHint" class="text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
+                  🔒 Isi Jumlah Anak Keseluruhan (0–35) terlebih dahulu
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Kolom 1: Misting dan Tumbler -->
+                <div class="rounded-2xl p-4 bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200">
+                  <label for="inputBoth" class="flex items-center gap-2 text-sm font-extrabold text-emerald-900 mb-1">
+                    <span class="text-lg">🍱🧴</span> Misting dan Tumbler
+                  </label>
+                  <p class="text-xs text-emerald-700 mb-3">Membawa keduanya lengkap</p>
+                  <input type="number" id="inputBoth" min="0" max="35" step="1" value="0" disabled
+                    oninput="handleFormInputChange()"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-emerald-300 bg-white text-center text-2xl font-extrabold text-emerald-950 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/15 outline-none disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed" />
+                </div>
+
+                <!-- Kolom 2: Misting -->
+                <div class="rounded-2xl p-4 bg-gradient-to-br from-sky-50 to-blue-50 border-2 border-sky-200">
+                  <label for="inputMisting" class="flex items-center gap-2 text-sm font-extrabold text-sky-900 mb-1">
+                    <span class="text-lg">🍱</span> Misting
+                  </label>
+                  <p class="text-xs text-sky-700 mb-3">Hanya membawa tempat makan</p>
+                  <input type="number" id="inputMisting" min="0" max="35" step="1" value="0" disabled
+                    oninput="handleFormInputChange()"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-sky-300 bg-white text-center text-2xl font-extrabold text-sky-950 focus:border-sky-600 focus:ring-4 focus:ring-sky-500/15 outline-none disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed" />
+                </div>
+
+                <!-- Kolom 3: Tumbler -->
+                <div class="rounded-2xl p-4 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200">
+                  <label for="inputTumbler" class="flex items-center gap-2 text-sm font-extrabold text-amber-900 mb-1">
+                    <span class="text-lg">🧴</span> Tumbler
+                  </label>
+                  <p class="text-xs text-amber-700 mb-3">Hanya membawa botol minum</p>
+                  <input type="number" id="inputTumbler" min="0" max="35" step="1" value="0" disabled
+                    oninput="handleFormInputChange()"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-amber-300 bg-white text-center text-2xl font-extrabold text-amber-950 focus:border-amber-600 focus:ring-4 focus:ring-amber-500/15 outline-none disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:cursor-not-allowed" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Kalkulasi Otomatis -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Jumlah Tercatat</div>
+                  <div class="text-[11px] text-slate-400">Misting+Tumbler + Misting + Tumbler</div>
+                </div>
+                <div id="calcRecorded" class="text-2xl font-extrabold text-slate-900">0</div>
+              </div>
+
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Tidak Membawa</div>
+                  <div class="text-[11px] text-slate-400">Total Siswa − Jumlah Tercatat</div>
+                </div>
+                <div id="calcNotBringing" class="text-2xl font-extrabold text-slate-700">0</div>
+              </div>
+
+              <div class="rounded-2xl bg-indigo-50 border border-indigo-200 p-4 flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-bold uppercase tracking-wider text-indigo-700">Prosentase Lengkap</div>
+                  <div class="text-[11px] text-indigo-500">(Misting & Tumbler / Total) × 100%</div>
+                </div>
+                <div id="calcPercentage" class="text-2xl font-extrabold text-indigo-700">0,0%</div>
+              </div>
+            </div>
+
+            <!-- Peringatan Merah Jika Melebihi Total Siswa -->
+            <div id="overflowWarningBox" class="hidden rounded-2xl bg-rose-600 text-white p-4 shadow-md flex items-start gap-3">
+              <span class="text-xl shrink-0">🚨</span>
+              <div class="text-sm font-bold leading-snug">
+                Peringatan: Jumlah Tercatat (<span id="warnRecordedVal">0</span> siswa) melebihi Jumlah Anak Keseluruhan (<span id="warnTotalVal">0</span> siswa)! Silakan perbaiki angka input sebelum menyimpan.
+              </div>
+            </div>
+
+            <!-- Tombol Simpan -->
+            <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-slate-200">
+              <p class="text-xs text-slate-500">
+                Data otomatis tersimpan ke perangkat dan disinkronkan ke Ruang Cloud aktif.
+              </p>
+              <button type="button" id="btnSaveTeacherEntry" onclick="saveTeacherEntry()" disabled
+                class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:from-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-extrabold text-sm sm:text-base shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2">
+                <span>💾 Simpan & Kirim ke Panitia</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- HALAMAN 2: ADMIN PANITIA (TERKUNCI TOKEN)                 -->
+    <!-- ========================================================= -->
+    <section id="viewAdmin" class="hidden space-y-6 animate-in">
+
+      <!-- Admin Control Header -->
+      <div class="glass-card rounded-2xl p-5 shadow-soft border border-indigo-100">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-100 text-indigo-700 mb-1.5">
+              🛡️ Panel Kendali Admin Panitia • SDN 190 Cisaranten Kidul
+            </div>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Dashboard Monitoring & Rekapitulasi 31 Kelas</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Pantau kepatuhan harian, hitung persentase kelengkapan periode, dan ekspor laporan resmi.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="setAdminDefaultPeriod()"
+              class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs sm:text-sm font-bold transition">
+              🗓️ Periode 23 Nov – 4 Des 2026
+            </button>
+            <button type="button" onclick="manualReloadSync()"
+              class="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs sm:text-sm font-bold transition">
+              🔄 Muat Ulang Data
+            </button>
+            <button type="button" onclick="exportAdminCSV()"
+              class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-sm transition">
+              📥 Export CSV
+            </button>
+            <button type="button" onclick="openResetAllModal()"
+              class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs sm:text-sm font-bold transition">
+              ⚠️ Reset Hasil Rekapan Guru
+            </button>
+            <button type="button" onclick="logoutAdmin()"
+              class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs sm:text-sm font-bold transition">
+              🚪 Keluar Admin
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Kartu KPI -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card rounded-2xl p-5 shadow-soft border-l-4 border-indigo-600">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Kelas Mengisi</span>
+            <span class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-lg">🏫</span>
+          </div>
+          <div id="kpiClassesFilled" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">0 / 31</div>
+          <div id="kpiClassesDateLabel" class="text-xs text-slate-500 mt-1 font-medium">Tanggal: -</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 shadow-soft border-l-4 border-emerald-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Misting & Tumbler (Hari Ini)</span>
+            <span class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg">🍱🧴</span>
+          </div>
+          <div id="kpiTodayBoth" class="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-2">0 Siswa</div>
+          <div id="kpiTodayBothSub" class="text-xs text-slate-500 mt-1 font-medium">Lengkap keduanya</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 shadow-soft border-l-4 border-amber-500">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Misting / Tumbler (Hari Ini)</span>
+            <span class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">🍱 / 🧴</span>
+          </div>
+          <div id="kpiTodayPartial" class="text-2xl sm:text-3xl font-extrabold text-amber-700 mt-2">0 / 0</div>
+          <div class="text-xs text-slate-500 mt-1 font-medium">Misting saja / Tumbler saja</div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 shadow-soft border-l-4 border-purple-600">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Prosentase Lengkap (Periode)</span>
+            <span class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg">🏆</span>
+          </div>
+          <div id="kpiPeriodPct" class="text-2xl sm:text-3xl font-extrabold text-purple-700 mt-2">0,0%</div>
+          <div id="kpiPeriodRangeLabel" class="text-xs text-slate-500 mt-1 font-medium">23 Nov – 4 Des 2026</div>
+        </div>
+      </div>
+
+      <!-- Tabs Admin -->
+      <div class="glass-card rounded-2xl shadow-soft overflow-hidden">
+        <div class="border-b border-slate-200 bg-slate-50/80 px-4 sm:px-6 pt-3 flex flex-wrap gap-2">
+          <button type="button" id="adminTabBtn1" onclick="switchAdminTab(1)"
+            class="px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-extrabold border-b-2 border-indigo-600 bg-white text-indigo-700 shadow-sm transition">
+            📋 Hasil Rekapan Setiap Hari
+          </button>
+          <button type="button" id="adminTabBtn2" onclick="switchAdminTab(2)"
+            class="px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition">
+            🏆 Rekap Keseluruhan & Persentase
+          </button>
+        </div>
+
+        <!-- TAB 1: HASIL REKAPAN SETIAP HARI -->
+        <div id="adminTabContent1" class="p-4 sm:p-6 space-y-4">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+            <div class="flex flex-wrap items-end gap-3">
+              <div>
+                <label for="adminDailyDate" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                  Tanggal Harian
+                </label>
+                <input type="date" id="adminDailyDate" onchange="renderAdminDailyTable()"
+                  class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+
+              <div>
+                <label for="adminDailyStatusFilter" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
+                  Filter Status
+                </label>
+                <select id="adminDailyStatusFilter" onchange="renderAdminDailyTable()"
+                  class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="all">Semua (31 Kelas)</option>
+                  <option value="filled">Sudah Mengisi</option>
+                  <option value="unfilled">Belum Mengisi</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="button" onclick="resetAdminSelectedDate()"
+              class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold shadow-sm transition self-start md:self-auto">
+              🗑️ Reset Tanggal Ini
+            </button>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar rounded-2xl border border-slate-200">
+            <table class="w-full text-left border-collapse min-w-[820px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                  <th class="py-3.5 px-4">Kelas</th>
+                  <th class="py-3.5 px-4">Wali Kelas</th>
+                  <th class="py-3.5 px-4">Status</th>
+                  <th class="py-3.5 px-4 text-center">Jml Siswa</th>
+                  <th class="py-3.5 px-4 text-center text-emerald-800">Misting & Tumbler</th>
+                  <th class="py-3.5 px-4 text-center text-sky-800">Misting</th>
+                  <th class="py-3.5 px-4 text-center text-amber-800">Tumbler</th>
+                  <th class="py-3.5 px-4 text-right text-indigo-800">% Lengkap</th>
+                </tr>
+              </thead>
+              <tbody id="adminDailyTableBody" class="divide-y divide-slate-200 text-sm bg-white">
+                <!-- Diisi JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: REKAP KESELURUHAN & PERSENTASE -->
+        <div id="adminTabContent2" class="hidden p-4 sm:p-6 space-y-4">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100">
+            <div class="flex flex-wrap items-end gap-3">
+              <div>
+                <label for="adminPeriodFrom" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                  Dari Tanggal
+                </label>
+                <input type="date" id="adminPeriodFrom" value="2026-11-23"
+                  class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <div>
+                <label for="adminPeriodTo" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+                  Sampai Tanggal
+                </label>
+                <input type="date" id="adminPeriodTo" value="2026-12-04"
+                  class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <button type="button" onclick="renderAdminPeriodTable()"
+                class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm transition">
+                📊 Hitung Rekap
+              </button>
+            </div>
+            <div class="text-xs text-slate-600 font-medium">
+              Peringkat diurutkan berdasarkan <strong>Persentase Lengkap</strong> tertinggi pada rentang tanggal terpilih.
+            </div>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar rounded-2xl border border-slate-200">
+            <table class="w-full text-left border-collapse min-w-[880px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold uppercase tracking-wider border-b border-slate-200">
+                  <th class="py-3.5 px-4 text-center w-24">Peringkat</th>
+                  <th class="py-3.5 px-4">Kelas</th>
+                  <th class="py-3.5 px-4">Wali Kelas</th>
+                  <th class="py-3.5 px-4 text-center">Hari Lapor</th>
+                  <th class="py-3.5 px-4 text-center text-emerald-800">Total Misting & Tumbler</th>
+                  <th class="py-3.5 px-4 text-center text-sky-800">Total Misting</th>
+                  <th class="py-3.5 px-4 text-center text-amber-800">Total Tumbler</th>
+                  <th class="py-3.5 px-4 text-right text-indigo-800">Persentase Lengkap</th>
+                </tr>
+              </thead>
+              <tbody id="adminPeriodTableBody" class="divide-y divide-slate-200 text-sm bg-white">
+                <!-- Diisi JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-xs text-slate-500">
+    Sistem Rekapitulasi Misting & Tumbler Siswa (31 Rombel) • <strong>SDN 190 Cisaranten Kidul</strong>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: TOKEN AKSES ADMIN PANITIA                        -->
+  <!-- ========================================================= -->
+  <div id="adminTokenModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 animate-in">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl">
+            🛡️
+          </div>
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">Akses Admin Panitia</h3>
+            <p class="text-xs text-slate-500">Masukkan token keamanan panitia</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAdminTokenModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg">✕</button>
+      </div>
+
+      <form onsubmit="submitAdminToken(event)" class="space-y-4">
+        <div>
+          <label for="adminTokenInput" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+            Token Panitia
+          </label>
+          <input type="password" id="adminTokenInput" placeholder="Masukkan token akses..."
+            class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-500/15 outline-none text-base font-bold" />
+          <p id="adminTokenError" class="hidden mt-2 text-xs font-bold text-rose-600">
+            ❌ Token salah! Gunakan token resmi panitia (panitia-190).
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <button type="submit"
+            class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-md transition">
+            Masuk Dashboard Admin
+          </button>
+          <button type="button" onclick="closeAdminTokenModal()"
+            class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+            Batal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: PENGATURAN CLOUD & GOOGLE APPS SCRIPT            -->
+  <!-- ========================================================= -->
+  <div id="cloudModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 my-8 animate-in">
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center text-2xl">
+            ☁️
+          </div>
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">Pengaturan Sinkronisasi Cloud & Ruang</h3>
+            <p class="text-xs text-slate-500">Hubungkan semua perangkat wali kelas & panitia secara real-time</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCloudModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg">✕</button>
+      </div>
+
+      <div class="mt-5 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="cloudRoomInput" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+              Kode Ruang (Room ID)
+            </label>
+            <input type="text" id="cloudRoomInput" placeholder="sdn190-misting-2026"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm font-bold text-slate-800 focus:border-indigo-600 outline-none" />
+          </div>
+
+          <div>
+            <label for="cloudGasUrlInput" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+              URL Endpoint Cloud (GAS /exec atau Firebase)
+            </label>
+            <input type="url" id="cloudGasUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-xs text-slate-800 focus:border-indigo-600 outline-none" />
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-extrabold text-slate-700">🔗 Link Siap Sebar untuk Wali Kelas</span>
+            <button type="button" onclick="copyShareableLink()"
+              class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-sm transition">
+              📋 Salin Link Siap Sebar
+            </button>
+          </div>
+          <input type="text" id="shareableLinkPreview" readonly
+            class="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 font-mono text-xs text-slate-600 select-all" />
+          <p class="text-[11px] text-slate-500">
+            Bagikan tautan ini ke grup WhatsApp guru agar kode ruang dan URL Google Apps Script otomatis terpasang tanpa pengaturan manual.
+          </p>
+        </div>
+
+        <!-- Accordion Kode Google Apps Script -->
+        <details class="group rounded-2xl border border-slate-200 bg-slate-900 text-slate-100 overflow-hidden">
+          <summary class="cursor-pointer px-4 py-3 text-xs font-extrabold flex items-center justify-between bg-slate-800 hover:bg-slate-750 select-none">
+            <span>📜 Lihat & Salin Kode Google Apps Script (Code.gs)</span>
+            <span class="text-amber-300 group-open:rotate-180 transition-transform">▼</span>
+          </summary>
+          <div class="p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] text-slate-400">Deploy sebagai Web App (Execute as: Me, Who has access: Anyone)</span>
+              <button type="button" onclick="copyGasScript()"
+                class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold transition">
+                Salin Code.gs
+              </button>
+            </div>
+            <pre id="gasCodeBlock" class="text-[11px] font-mono bg-slate-950 p-3 rounded-xl overflow-x-auto max-h-56 text-emerald-300 leading-relaxed select-all"></pre>
+          </div>
+        </details>
+
+        <div class="flex flex-wrap items-center justify-end gap-2 pt-2 border-t border-slate-200">
+          <button type="button" onclick="closeCloudModal()"
+            class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold transition">
+            Tutup
+          </button>
+          <button type="button" onclick="saveCloudSettings()"
+            class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-extrabold shadow-md transition">
+            💾 Simpan & Sinkronkan Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: RIWAYAT KELAS SAYA                               -->
+  <!-- ========================================================= -->
+  <div id="historyModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 animate-in">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div>
+          <h3 id="historyModalTitle" class="text-lg font-extrabold text-slate-900">Riwayat Pengisian Kelas</h3>
+          <p id="historyModalSubtitle" class="text-xs text-slate-500">Daftar tanggal yang sudah dilaporkan</p>
+        </div>
+        <button type="button" onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg">✕</button>
+      </div>
+
+      <div class="mt-4 max-h-80 overflow-y-auto custom-scrollbar rounded-xl border border-slate-200">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 font-extrabold border-b border-slate-200">
+              <th class="py-2.5 px-3">Tanggal</th>
+              <th class="py-2.5 px-3 text-center">Siswa</th>
+              <th class="py-2.5 px-3 text-center text-emerald-700">Misting & Tumbler</th>
+              <th class="py-2.5 px-3 text-center text-sky-700">Misting</th>
+              <th class="py-2.5 px-3 text-center text-amber-700">Tumbler</th>
+              <th class="py-2.5 px-3 text-right text-indigo-700">% Lengkap</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody" class="divide-y divide-slate-200">
+            <!-- Diisi JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 flex justify-end">
+        <button type="button" onclick="closeHistoryModal()"
+          class="px-5 py-2 rounded-xl bg-slate-800 text-white text-sm font-bold hover:bg-slate-900 transition">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: KONFIRMASI RESET DATA                            -->
+  <!-- ========================================================= -->
+  <div id="resetConfirmModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border-2 border-rose-200 animate-in">
+      <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl mb-3">
+        ⚠️
+      </div>
+      <h3 id="resetModalTitle" class="text-lg font-extrabold text-slate-900">Konfirmasi Reset Data</h3>
+      <p id="resetModalDesc" class="text-sm text-slate-600 mt-1.5 leading-relaxed">
+        Tindakan ini akan menghapus data rekapan dan menyinkronkan status reset ke semua perangkat di ruang cloud ini.
+      </p>
+      <div class="mt-5 flex items-center gap-2.5">
+        <button type="button" id="btnConfirmResetAction"
+          class="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm shadow-md transition">
+          Ya, Reset Sekarang
+        </button>
+        <button type="button" onclick="closeResetConfirmModal()"
+          class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT UTAMA                                          -->
+  <!-- ========================================================= -->
+  <script>
+    const CLASSES_DATA = [
+      { id: "1A", grade: 1, teacher: "Dadah Sayidah, S.Pd" },
+      { id: "1B", grade: 1, teacher: "Mujiyem, S.Pd" },
+      { id: "1C", grade: 1, teacher: "Nurfadhilah Shofwah, S.Pd" },
+      { id: "1D", grade: 1, teacher: "Sri Wahyuni Samsi, S.Pd" },
+      { id: "1E", grade: 1, teacher: "Risna Nalaratih S.Pd.I" },
+      { id: "2A", grade: 2, teacher: "Ngadiyati, S.Pd" },
+      { id: "2B", grade: 2, teacher: "Yani, S.Pd" },
+      { id: "2C", grade: 2, teacher: "Nina Kartini, S.Pd" },
+      { id: "2D", grade: 2, teacher: "Triane Roghbie Utami, S.Pd" },
+      { id: "2E", grade: 2, teacher: "Sri Dewi Febriani Sasty, S.Pd" },
+      { id: "2F", grade: 2, teacher: "Eulis Sri Karyati, S.Pd" },
+      { id: "3A", grade: 3, teacher: "Hani Yuliani, S.Pd" },
+      { id: "3B", grade: 3, teacher: "Aydiraz Fadhlurahman, S.Pd" },
+      { id: "3C", grade: 3, teacher: "Yasusi Aqasih, S.Pd" },
+      { id: "3D", grade: 3, teacher: "Miraditya Hartifa Claudia, S.Pd" },
+      { id: "3E", grade: 3, teacher: "Idah Mujahidah, S.Pd" },
+      { id: "4A", grade: 4, teacher: "Nurani Hadiyani, S.Pd" },
+      { id: "4B", grade: 4, teacher: "Riki, S.Pd" },
+      { id: "4C", grade: 4, teacher: "Ervin Rovi Yulianti, S.Pd" },
+      { id: "4D", grade: 4, teacher: "Wulan Maulani, S.Pd" },
+      { id: "4E", grade: 4, teacher: "Neng Nelly Puspitawati, S.Pd" },
+      { id: "5A", grade: 5, teacher: "Tessa Puspitasari, S.Pd" },
+      { id: "5B", grade: 5, teacher: "Lilis Ida Haryani, S.Pd" },
+      { id: "5C", grade: 5, teacher: "Dadan Ramdani, S.Pd" },
+      { id: "5D", grade: 5, teacher: "Siti Melani, S.Pd" },
+      { id: "5E", grade: 5, teacher: "Eny Siti Qomariyah, S.Pd" },
+      { id: "6A", grade: 6, teacher: "Agus Supian, S.Pd" },
+      { id: "6B", grade: 6, teacher: "Ayi Suherman, S.Pd" },
+      { id: "6C", grade: 6, teacher: "Eni Haryani, S.Pd" },
+      { id: "6D", grade: 6, teacher: "Sarah Ratna Sari, S.Pd" },
+      { id: "6E", grade: 6, teacher: "Raden Drian Astriyendy, S.Pd" }
+    ];
+
+    const GRADE_THEMES = {
+      1: { label: "Kelas 1", badge: "bg-rose-100 text-rose-700 border-rose-200", accent: "border-rose-200" },
+      2: { label: "Kelas 2", badge: "bg-orange-100 text-orange-700 border-orange-200", accent: "border-orange-200" },
+      3: { label: "Kelas 3", badge: "bg-amber-100 text-amber-800 border-amber-200", accent: "border-amber-200" },
+      4: { label: "Kelas 4", badge: "bg-emerald-100 text-emerald-700 border-emerald-200", accent: "border-emerald-200" },
+      5: { label: "Kelas 5", badge: "bg-sky-100 text-sky-700 border-sky-200", accent: "border-sky-200" },
+      6: { label: "Kelas 6", badge: "bg-indigo-100 text-indigo-700 border-indigo-200", accent: "border-indigo-200" }
+    };
+
+    const ADMIN_TOKEN = "panitia-190";
+    const DEFAULT_ROOM = "sdn190-misting-2026";
+    const DEFAULT_PERIOD_START = "2026-11-23";
+    const DEFAULT_PERIOD_END = "2026-12-04";
+
+    const GAS_CODE_TEMPLATE = [
+      '/**',
+      ' * Google Apps Script Backend untuk:',
+      ' * Rekap Misting & Tumbler Siswa — SDN 190 Cisaranten Kidul (31 Kelas)',
+      ' * Tab otomatis: "Sync_Store" & "Rekap_Misting_Tumbler"',
+      ' */',
+      'const TEACHERS_MAP = {',
+      '  "1A": "Dadah Sayidah, S.Pd", "1B": "Mujiyem, S.Pd", "1C": "Nurfadhilah Shofwah, S.Pd",',
+      '  "1D": "Sri Wahyuni Samsi, S.Pd", "1E": "Risna Nalaratih S.Pd.I", "2A": "Ngadiyati, S.Pd",',
+      '  "2B": "Yani, S.Pd", "2C": "Nina Kartini, S.Pd", "2D": "Triane Roghbie Utami, S.Pd",',
+      '  "2E": "Sri Dewi Febriani Sasty, S.Pd", "2F": "Eulis Sri Karyati, S.Pd", "3A": "Hani Yuliani, S.Pd",',
+      '  "3B": "Aydiraz Fadhlurahman, S.Pd", "3C": "Yasusi Aqasih, S.Pd", "3D": "Miraditya Hartifa Claudia, S.Pd",',
+      '  "3E": "Idah Mujahidah, S.Pd", "4A": "Nurani Hadiyani, S.Pd", "4B": "Riki, S.Pd",',
+      '  "4C": "Ervin Rovi Yulianti, S.Pd", "4D": "Wulan Maulani, S.Pd", "4E": "Neng Nelly Puspitawati, S.Pd",',
+      '  "5A": "Tessa Puspitasari, S.Pd", "5B": "Lilis Ida Haryani, S.Pd", "5C": "Dadan Ramdani, S.Pd",',
+      '  "5D": "Siti Melani, S.Pd", "5E": "Eny Siti Qomariyah, S.Pd", "6A": "Agus Supian, S.Pd",',
+      '  "6B": "Ayi Suherman, S.Pd", "6C": "Eni Haryani, S.Pd", "6D": "Sarah Ratna Sari, S.Pd",',
+      '  "6E": "Raden Drian Astriyendy, S.Pd"',
+      '};',
+      '',
+      'function doGet(e) {',
+      '  const room = (e && e.parameter && e.parameter.room) ? String(e.parameter.room).trim() : "sdn190-misting-2026";',
+      '  const ss = SpreadsheetApp.getActiveSpreadsheet();',
+      '  const storeSheet = getOrCreateSheet_(ss, "Sync_Store", ["Room", "PayloadJSON", "UpdatedAt"]);',
+      '  const rows = storeSheet.getDataRange().getValues();',
+      '  let foundPayload = { room: room, records: {}, resetAt: 0, deletedEntries: {}, updatedAt: 0 };',
+      '  for (let i = 1; i < rows.length; i++) {',
+      '    if (String(rows[i][0]) === room && rows[i][1]) {',
+      '      try { foundPayload = JSON.parse(rows[i][1]); } catch (err) {}',
+      '      break;',
+      '    }',
+      '  }',
+      '  return ContentService.createTextOutput(JSON.stringify({ ok: true, data: foundPayload })).setMimeType(ContentService.MimeType.JSON);',
+      '}',
+      '',
+      'function doPost(e) {',
+      '  const lock = LockService.getScriptLock();',
+      '  lock.waitLock(15000);',
+      '  try {',
+      '    const body = JSON.parse(e.postData.contents);',
+      '    const room = String(body.room || "sdn190-misting-2026").trim();',
+      '    const ss = SpreadsheetApp.getActiveSpreadsheet();',
+      '    const storeSheet = getOrCreateSheet_(ss, "Sync_Store", ["Room", "PayloadJSON", "UpdatedAt"]);',
+      '    const rows = storeSheet.getDataRange().getValues();',
+      '    let rowIndex = -1;',
+      '    let current = { room: room, records: {}, resetAt: 0, deletedEntries: {}, updatedAt: 0 };',
+      '    for (let i = 1; i < rows.length; i++) {',
+      '      if (String(rows[i][0]) === room) {',
+      '        rowIndex = i + 1;',
+      '        try { current = JSON.parse(rows[i][1]); } catch (err) {}',
+      '        break;',
+      '      }',
+      '    }',
+      '    const maxResetAt = Math.max(Number(current.resetAt || 0), Number(body.resetAt || 0));',
+      '    const mergedDeleted = Object.assign({}, current.deletedEntries || {}, body.deletedEntries || {});',
+      '    Object.keys(mergedDeleted).forEach(function(k) { if (Number(mergedDeleted[k]) <= maxResetAt) delete mergedDeleted[k]; });',
+      '    const mergedRecords = {};',
+      '    [current.records || {}, body.records || {}].forEach(function(src) {',
+      '      Object.keys(src).forEach(function(key) {',
+      '        const item = src[key];',
+      '        if (!item || !item.updatedAt) return;',
+      '        if (Number(item.updatedAt) <= maxResetAt) return;',
+      '        if (mergedDeleted[key] && Number(mergedDeleted[key]) >= Number(item.updatedAt)) return;',
+      '        if (!mergedRecords[key] || Number(item.updatedAt) >= Number(mergedRecords[key].updatedAt)) mergedRecords[key] = item;',
+      '      });',
+      '    });',
+      '    const finalState = { room: room, records: mergedRecords, resetAt: maxResetAt, deletedEntries: mergedDeleted, updatedAt: Date.now() };',
+      '    const jsonStr = JSON.stringify(finalState);',
+      '    const nowStr = new Date().toISOString();',
+      '    if (rowIndex > 0) { storeSheet.getRange(rowIndex, 1, 1, 3).setValues([[room, jsonStr, nowStr]]); }',
+      '    else { storeSheet.appendRow([room, jsonStr, nowStr]); }',
+      '    rebuildRecapSheet_(ss, room, mergedRecords);',
+      '    return ContentService.createTextOutput(JSON.stringify({ ok: true, data: finalState })).setMimeType(ContentService.MimeType.JSON);',
+      '  } catch (err) {',
+      '    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: String(err) })).setMimeType(ContentService.MimeType.JSON);',
+      '  } finally {',
+      '    lock.releaseLock();',
+      '  }',
+      '}',
+      '',
+      'function rebuildRecapSheet_(ss, room, records) {',
+      '  const headers = ["Room", "Tanggal", "Kelas", "Wali Kelas", "Jumlah Siswa", "Misting & Tumbler", "Misting", "Tumbler", "Jumlah Tercatat", "Tidak Membawa", "Prosentase Lengkap (%)", "Terakhir Diperbarui"];',
+      '  const sheet = getOrCreateSheet_(ss, "Rekap_Misting_Tumbler", headers);',
+      '  const existing = sheet.getDataRange().getValues();',
+      '  const keptRows = [];',
+      '  for (let i = 1; i < existing.length; i++) { if (String(existing[i][0]) !== room) keptRows.push(existing[i]); }',
+      '  Object.keys(records).sort().forEach(function(k) {',
+      '    const r = records[k];',
+      '    const total = Number(r.totalStudents || 0);',
+      '    const both = Number(r.both || 0);',
+      '    const misting = Number(r.misting || 0);',
+      '    const tumbler = Number(r.tumbler || 0);',
+      '    const recorded = both + misting + tumbler;',
+      '    const notBringing = Math.max(0, total - recorded);',
+      '    const pct = total > 0 ? ((both / total) * 100).toFixed(1).replace(".", ",") + "%" : "0,0%";',
+      '    keptRows.push([room, r.date, r.classId, TEACHERS_MAP[r.classId] || r.teacher || "", total, both, misting, tumbler, recorded, notBringing, pct, new Date(r.updatedAt).toLocaleString("id-ID")]);',
+      '  });',
+      '  sheet.clearContents();',
+      '  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);',
+      '  if (keptRows.length > 0) sheet.getRange(2, 1, keptRows.length, headers.length).setValues(keptRows);',
+      '}',
+      '',
+      'function getOrCreateSheet_(ss, name, headers) {',
+      '  let sh = ss.getSheetByName(name);',
+      '  if (!sh) { sh = ss.insertSheet(name); sh.getRange(1, 1, 1, headers.length).setValues([headers]); }',
+      '  return sh;',
+      '}'
+    ].join("\n");
+
+    let appConfig = { room: DEFAULT_ROOM, gasUrl: "" };
+    let syncState = { room: DEFAULT_ROOM, records: {}, resetAt: 0, deletedEntries: {}, updatedAt: 0 };
+    let uiState = {
+      mainView: "teacher",
+      teacherDate: getTodayISO(),
+      pendingClassId: null,
+      unlockedClassId: null,
+      isAdminAuthenticated: false,
+      adminTab: 1,
+      adminDailyDate: getTodayISO(),
+      adminPeriodFrom: DEFAULT_PERIOD_START,
+      adminPeriodTo: DEFAULT_PERIOD_END
+    };
+
+    let bcChannel = null;
+    let pollIntervalId = null;
+
+    function getTodayISO() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDateID(isoDate) {
+      if (!isoDate) return "-";
+      const parts = isoDate.split("-");
+      if (parts.length !== 3) return isoDate;
+      const dateObj = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      return dateObj.toLocaleDateString("id-ID", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+    }
+
+    function formatPctComma(value) {
+      return Number(value || 0).toFixed(1).replace(".", ",") + "%";
+    }
+
+    function normalizeTeacherName(rawName) {
+      if (!rawName) return "";
+      let str = String(rawName).toLowerCase();
+      const titlePatterns = [
+        "\\bs\\.?\\s*pd\\.?\\s*i\\.?\\b",
+        "\\bs\\.?\\s*pd\\.?\\b",
+        "\\bm\\.?\\s*pd\\.?\\b",
+        "\\bs\\.?\\s*ag\\.?\\b",
+        "\\bs\\.?\\s*kom\\.?\\b",
+        "\\bs\\.?\\s*e\\.?\\b",
+        "\\bgr\\.?\\b",
+        "\\bdra\\.?\\b",
+        "\\bdrs\\.?\\b",
+        "\\bhj\\.?\\b",
+        "\\bh\\.?\\b"
+      ];
+      titlePatterns.forEach((pattern) => {
+        str = str.replace(new RegExp(pattern, "g"), " ");
+      });
+      str = str.replace(/[^a-z\s]/g, " ");
+      str = str.replace(/\s+/g, " ").trim();
+      return str;
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const el = document.createElement("div");
+      const styles = {
+        success: "bg-emerald-600 text-white border-emerald-400",
+        error: "bg-rose-600 text-white border-rose-400",
+        warning: "bg-amber-500 text-slate-950 border-amber-300",
+        info: "bg-slate-900 text-white border-slate-700"
+      };
+      el.className = `pointer-events-auto px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-bold flex items-center gap-2.5 animate-in ${styles[type] || styles.info}`;
+      el.innerHTML = `<span>${message}</span>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(8px)";
+        el.style.transition = "all 0.25s ease";
+        setTimeout(() => el.remove(), 260);
+      }, 3200);
+    }
+
+    function getStorageKey() {
+      return `sdn190_misting_room_${appConfig.room}`;
+    }
+
+    function initConfigFromUrlAndStorage() {
+      const params = new URLSearchParams(window.location.search);
+      const savedConfigRaw = localStorage.getItem("sdn190_misting_config");
+      if (savedConfigRaw) {
+        try {
+          const parsed = JSON.parse(savedConfigRaw);
+          if (parsed.room) appConfig.room = parsed.room;
+          if (parsed.gasUrl) appConfig.gasUrl = parsed.gasUrl;
+        } catch (e) {}
+      }
+      if (params.get("room")) appConfig.room = params.get("room").trim();
+      if (params.get("gas")) appConfig.gasUrl = params.get("gas").trim();
+
+      localStorage.setItem("sdn190_misting_config", JSON.stringify(appConfig));
+      document.getElementById("headerRoomLabel").textContent = appConfig.room;
+      syncState.room = appConfig.room;
+    }
+
+    function loadLocalState() {
+      const raw = localStorage.getItem(getStorageKey());
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          syncState = {
+            room: appConfig.room,
+            records: parsed.records || {},
+            resetAt: Number(parsed.resetAt || 0),
+            deletedEntries: parsed.deletedEntries || {},
+            updatedAt: Number(parsed.updatedAt || 0)
+          };
+          return;
+        } catch (e) {}
+      }
+      syncState = { room: appConfig.room, records: {}, resetAt: 0, deletedEntries: {}, updatedAt: 0 };
+    }
+
+    function saveLocalState() {
+      syncState.room = appConfig.room;
+      localStorage.setItem(getStorageKey(), JSON.stringify(syncState));
+    }
+
+    function mergeRemoteState(remote) {
+      if (!remote || typeof remote !== "object") return false;
+      let changed = false;
+
+      const incomingReset = Number(remote.resetAt || 0);
+      if (incomingReset > syncState.resetAt) {
+        syncState.resetAt = incomingReset;
+        changed = true;
+      }
+
+      const incomingDeleted = remote.deletedEntries || {};
+      Object.keys(incomingDeleted).forEach((k) => {
+        const ts = Number(incomingDeleted[k] || 0);
+        if (ts > syncState.resetAt && (!syncState.deletedEntries[k] || ts > syncState.deletedEntries[k])) {
+          syncState.deletedEntries[k] = ts;
+          changed = true;
+        }
+      });
+
+      Object.keys(syncState.deletedEntries).forEach((k) => {
+        if (syncState.deletedEntries[k] <= syncState.resetAt) delete syncState.deletedEntries[k];
+      });
+
+      const incomingRecords = remote.records || {};
+      Object.keys(incomingRecords).forEach((k) => {
+        const item = incomingRecords[k];
+        if (!item || !item.updatedAt) return;
+        const itemTs = Number(item.updatedAt);
+        if (itemTs <= syncState.resetAt) return;
+        if (syncState.deletedEntries[k] && syncState.deletedEntries[k] >= itemTs) return;
+
+        const existing = syncState.records[k];
+        if (!existing || itemTs > Number(existing.updatedAt || 0)) {
+          syncState.records[k] = item;
+          changed = true;
+        }
+      });
+
+      Object.keys(syncState.records).forEach((k) => {
+        const item = syncState.records[k];
+        const itemTs = Number(item.updatedAt || 0);
+        if (itemTs <= syncState.resetAt || (syncState.deletedEntries[k] && syncState.deletedEntries[k] >= itemTs)) {
+          delete syncState.records[k];
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        syncState.updatedAt = Date.now();
+        saveLocalState();
+      }
+      return changed;
+    }
+
+    function setupBroadcastChannel() {
+      if (bcChannel) {
+        try { bcChannel.close(); } catch (e) {}
+      }
+      if ("BroadcastChannel" in window) {
+        bcChannel = new BroadcastChannel(`channel_${getStorageKey()}`);
+        bcChannel.onmessage = (event) => {
+          if (event.data && event.data.type === "STATE_SYNC") {
+            if (mergeRemoteState(event.data.payload)) refreshAllViews();
+          }
+        };
+      }
+    }
+
+    function broadcastState() {
+      if (bcChannel) bcChannel.postMessage({ type: "STATE_SYNC", payload: syncState });
+    }
+
+    function updateSyncStatusBadge(mode, label) {
+      const dot = document.getElementById("syncDot");
+      const text = document.getElementById("syncText");
+      text.textContent = label;
+      dot.className = "w-2 h-2 rounded-full ";
+      if (mode === "cloud-ok") dot.className += "bg-emerald-300 animate-pulse";
+      else if (mode === "syncing") dot.className += "bg-amber-300 animate-ping";
+      else if (mode === "error") dot.className += "bg-rose-400";
+      else dot.className += "bg-sky-300 animate-pulse";
+    }
+
+    function normalizeFirebaseUrl(baseUrl, room) {
+      let clean = baseUrl.replace(/\/+$/, "");
+      if (!clean.endsWith(".json")) clean = `${clean}/rooms/${encodeURIComponent(room)}.json`;
+      return clean;
+    }
+
+    async function pushToCloud(actionName = "upsert") {
+      saveLocalState();
+      broadcastState();
+      if (!appConfig.gasUrl) {
+        updateSyncStatusBadge("local", "Lokal & Antar-Tab Aktif");
+        return;
+      }
+      updateSyncStatusBadge("syncing", "Menyinkronkan Cloud...");
+      const payload = {
+        room: appConfig.room,
+        action: actionName,
+        records: syncState.records,
+        resetAt: syncState.resetAt,
+        deletedEntries: syncState.deletedEntries,
+        updatedAt: Date.now()
+      };
+      try {
+        if (appConfig.gasUrl.includes("firebaseio.com") || appConfig.gasUrl.includes("firebasedatabase.app")) {
+          const fbUrl = normalizeFirebaseUrl(appConfig.gasUrl, appConfig.room);
+          const res = await fetch(fbUrl, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error("Firebase PUT gagal");
+          updateSyncStatusBadge("cloud-ok", "Cloud Firebase Terhubung");
+        } else {
+          const res = await fetch(appConfig.gasUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+          const json = await res.json();
+          if (json && json.ok && json.data && mergeRemoteState(json.data)) refreshAllViews();
+          updateSyncStatusBadge("cloud-ok", "Cloud GAS Terhubung");
+        }
+      } catch (err) {
+        updateSyncStatusBadge("error", "Offline / Gagal Cloud (Tersimpan Lokal)");
+      }
+    }
+
+    async function pullFromCloud(silent = true) {
+      if (!appConfig.gasUrl) {
+        updateSyncStatusBadge("local", "Lokal & Antar-Tab Aktif");
+        return;
+      }
+      if (!silent) updateSyncStatusBadge("syncing", "Memuat dari Cloud...");
+      try {
+        let remoteData = null;
+        if (appConfig.gasUrl.includes("firebaseio.com") || appConfig.gasUrl.includes("firebasedatabase.app")) {
+          const fbUrl = normalizeFirebaseUrl(appConfig.gasUrl, appConfig.room);
+          const res = await fetch(fbUrl);
+          if (res.ok) remoteData = await res.json();
+          updateSyncStatusBadge("cloud-ok", "Cloud Firebase Terhubung");
+        } else {
+          const sep = appConfig.gasUrl.includes("?") ? "&" : "?";
+          const url = `${appConfig.gasUrl}${sep}room=${encodeURIComponent(appConfig.room)}&_t=${Date.now()}`;
+          const res = await fetch(url);
+          if (res.ok) {
+            const json = await res.json();
+            remoteData = json && json.data ? json.data : json;
+          }
+          updateSyncStatusBadge("cloud-ok", "Cloud GAS Terhubung");
+        }
+        if (remoteData && mergeRemoteState(remoteData)) refreshAllViews();
+      } catch (err) {
+        updateSyncStatusBadge("error", "Cloud Tidak Terjangkau (Mode Lokal)");
+      }
+    }
+
+    function startPolling() {
+      if (pollIntervalId) clearInterval(pollIntervalId);
+      pollIntervalId = setInterval(() => {
+        if (appConfig.gasUrl) pullFromCloud(true);
+      }, 15000);
+    }
+
+    function switchMainView(view) {
+      if (view === "admin" && !uiState.isAdminAuthenticated) {
+        openAdminTokenModal();
+        return;
+      }
+      uiState.mainView = view;
+      const teacherSec = document.getElementById("viewTeacher");
+      const adminSec = document.getElementById("viewAdmin");
+      const navTeacher = document.getElementById("navTeacher");
+      const navAdmin = document.getElementById("navAdmin");
+
+      if (view === "teacher") {
+        teacherSec.classList.remove("hidden");
+        adminSec.classList.add("hidden");
+        navTeacher.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-white text-indigo-700 shadow";
+        navAdmin.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-white/90 hover:text-white";
+        renderTeacherView();
+      } else {
+        teacherSec.classList.add("hidden");
+        adminSec.classList.remove("hidden");
+        navAdmin.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-white text-indigo-700 shadow";
+        navTeacher.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-white/90 hover:text-white";
+        renderAdminView();
+      }
+    }
+
+    function downloadHtmlFile() {
+      const htmlContent = ["<!DOCTYPE html>", document.documentElement.outerHTML].join("\n");
+      const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Rekap-Misting-Tumbler-SDN190-${appConfig.room}.html`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("✅ File HTML aplikasi berhasil diunduh!", "success");
+    }
+
+    function setTeacherDateToday() {
+      uiState.teacherDate = getTodayISO();
+      document.getElementById("teacherDateInput").value = uiState.teacherDate;
+      renderTeacherView();
+    }
+
+    function renderTeacherView() {
+      const dateVal = uiState.teacherDate;
+      document.getElementById("teacherDateInput").value = dateVal;
+      document.getElementById("teacherDateFormatted").textContent = formatDateID(dateVal);
+
+      let filledCount = 0;
+      CLASSES_DATA.forEach((cls) => {
+        if (syncState.records[`${dateVal}_${cls.id}`]) filledCount++;
+      });
+      document.getElementById("teacherFilledCounter").textContent = `${filledCount} / 31 Kelas Terisi`;
+
+      const gridContainer = document.getElementById("classGridContainer");
+      gridContainer.innerHTML = "";
+
+      for (let grade = 1; grade <= 6; grade++) {
+        const gradeClasses = CLASSES_DATA.filter((c) => c.grade === grade);
+        const theme = GRADE_THEMES[grade];
+        const filledInGrade = gradeClasses.filter((c) => Boolean(syncState.records[`${dateVal}_${c.id}`])).length;
+
+        const card = document.createElement("div");
+        card.className = `rounded-2xl bg-white border ${theme.accent} p-4 shadow-sm flex flex-col justify-between`;
+
+        let buttonsHtml = "";
+        gradeClasses.forEach((cls) => {
+          const recKey = `${dateVal}_${cls.id}`;
+          const isFilled = Boolean(syncState.records[recKey]);
+          const isUnlocked = uiState.unlockedClassId === cls.id;
+          const isPending = uiState.pendingClassId === cls.id;
+
+          let btnStyle = "bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-800";
+          if (isUnlocked) btnStyle = "bg-indigo-600 text-white border-indigo-600 ring-4 ring-indigo-500/20 shadow-md";
+          else if (isPending) btnStyle = "bg-amber-50 text-amber-900 border-amber-400 ring-2 ring-amber-300";
+          else if (isFilled) btnStyle = "bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 border-emerald-300";
+
+          const dotClass = isFilled
+            ? (isUnlocked ? "bg-emerald-300" : "bg-emerald-500")
+            : (isUnlocked ? "bg-white/60" : "bg-slate-300");
+
+          const lockIcon = isUnlocked ? "🔓" : "🔒";
+
+          buttonsHtml += `
+            <button type="button" onclick="handleClassButtonClick('${cls.id}')"
+              class="relative flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border-2 transition ${btnStyle}">
+              <div class="flex items-center justify-between w-full px-1 mb-0.5">
+                <span class="w-2 h-2 rounded-full ${dotClass}"></span>
+                <span class="text-xs">${lockIcon}</span>
+              </div>
+              <span class="text-base font-extrabold tracking-tight">${cls.id}</span>
+              <span class="text-[10px] font-semibold truncate max-w-full opacity-80">
+                ${isFilled ? "Terisi" : "Kosong"}
+              </span>
+            </button>
+          `;
+        });
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${theme.badge}">
+                ${theme.label}
+              </span>
+              <span class="text-xs font-bold text-slate-500">${filledInGrade}/${gradeClasses.length} Terisi</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              ${buttonsHtml}
+            </div>
+          </div>
+        `;
+        gridContainer.appendChild(card);
+      }
+
+      if (uiState.unlockedClassId) populateUnlockedTeacherForm();
+    }
+
+    function handleClassButtonClick(classId) {
+      if (uiState.unlockedClassId === classId) {
+        populateUnlockedTeacherForm();
+        document.getElementById("teacherFormSection").scrollIntoView({ behavior: "smooth", block: "nearest" });
+        return;
+      }
+      uiState.pendingClassId = classId;
+      uiState.unlockedClassId = null;
+
+      document.getElementById("teacherFormSection").classList.add("hidden");
+      const lockSection = document.getElementById("lockCardSection");
+      lockSection.classList.remove("hidden");
+
+      document.getElementById("lockTargetClass").textContent = classId;
+      document.getElementById("lockTargetClassInline").textContent = classId;
+      document.getElementById("teacherNameInput").value = "";
+      document.getElementById("unlockErrorMsg").classList.add("hidden");
+
+      renderTeacherView();
+      setTimeout(() => {
+        document.getElementById("teacherNameInput").focus();
+        lockSection.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 60);
+    }
+
+    function closeLockCard() {
+      uiState.pendingClassId = null;
+      document.getElementById("lockCardSection").classList.add("hidden");
+      renderTeacherView();
+    }
+
+    function handleUnlockSubmit(event) {
+      event.preventDefault();
+      const classId = uiState.pendingClassId;
+      if (!classId) return;
+      const classObj = CLASSES_DATA.find((c) => c.id === classId);
+      if (!classObj) return;
+
+      const typed = normalizeTeacherName(document.getElementById("teacherNameInput").value);
+      const expected = normalizeTeacherName(classObj.teacher);
+
+      if (typed.length > 0 && typed === expected) {
+        uiState.unlockedClassId = classId;
+        uiState.pendingClassId = null;
+        document.getElementById("lockCardSection").classList.add("hidden");
+        document.getElementById("unlockErrorMsg").classList.add("hidden");
+        populateUnlockedTeacherForm();
+        renderTeacherView();
+        showToast(`🔓 Kunci Kelas ${classId} terbuka (${classObj.teacher})`, "success");
+        setTimeout(() => {
+          document.getElementById("teacherFormSection").scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 80);
+      } else {
+        document.getElementById("unlockErrorMsg").classList.remove("hidden");
+      }
+    }
+
+    function lockCurrentClass() {
+      uiState.unlockedClassId = null;
+      uiState.pendingClassId = null;
+      document.getElementById("teacherFormSection").classList.add("hidden");
+      document.getElementById("lockCardSection").classList.add("hidden");
+      renderTeacherView();
+      showToast("🔒 Kelas berhasil dikunci kembali.", "info");
+    }
+
+    function populateUnlockedTeacherForm() {
+      const classId = uiState.unlockedClassId;
+      if (!classId) return;
+      const classObj = CLASSES_DATA.find((c) => c.id === classId);
+      const dateVal = uiState.teacherDate;
+      const recKey = `${dateVal}_${classId}`;
+      const existing = syncState.records[recKey];
+
+      document.getElementById("teacherFormSection").classList.remove("hidden");
+      document.getElementById("formClassBadge").textContent = classId;
+      document.getElementById("formTeacherName").textContent = classObj.teacher;
+      document.getElementById("formDateSubtitle").textContent = `Tanggal Pengisian: ${formatDateID(dateVal)}`;
+
+      const statusBadge = document.getElementById("formSavedStatusBadge");
+      const btnDelete = document.getElementById("btnDeleteEntry");
+
+      if (existing) {
+        statusBadge.textContent = "✅ Sudah Tersimpan";
+        statusBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-200 text-emerald-950";
+        btnDelete.classList.remove("hidden");
+        document.getElementById("inputTotalStudents").value = existing.totalStudents;
+        document.getElementById("inputBoth").value = existing.both;
+        document.getElementById("inputMisting").value = existing.misting;
+        document.getElementById("inputTumbler").value = existing.tumbler;
+      } else {
+        statusBadge.textContent = "⏳ Belum Tersimpan pada Tanggal Ini";
+        statusBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-300 text-slate-900";
+        btnDelete.classList.add("hidden");
+        document.getElementById("inputTotalStudents").value = "";
+        document.getElementById("inputBoth").value = 0;
+        document.getElementById("inputMisting").value = 0;
+        document.getElementById("inputTumbler").value = 0;
+      }
+      handleFormInputChange();
+    }
+
+    function handleFormInputChange() {
+      const totalRaw = document.getElementById("inputTotalStudents").value.trim();
+      const totalErrEl = document.getElementById("totalStudentsError");
+      const inputBoth = document.getElementById("inputBoth");
+      const inputMisting = document.getElementById("inputMisting");
+      const inputTumbler = document.getElementById("inputTumbler");
+      const lockHint = document.getElementById("inputsLockHint");
+      const btnSave = document.getElementById("btnSaveTeacherEntry");
+      const warnBox = document.getElementById("overflowWarningBox");
+
+      const parsedTotal = Number(totalRaw);
+      const isTotalValid = totalRaw !== "" && Number.isInteger(parsedTotal) && parsedTotal >= 0 && parsedTotal <= 35;
+
+      totalErrEl.classList.toggle("hidden", totalRaw === "" || isTotalValid);
+      inputBoth.disabled = !isTotalValid;
+      inputMisting.disabled = !isTotalValid;
+      inputTumbler.disabled = !isTotalValid;
+
+      if (isTotalValid) {
+        lockHint.textContent = "🔓 Kolom input aktif";
+        lockHint.className = "text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full";
+      } else {
+        lockHint.textContent = "🔒 Isi Jumlah Anak Keseluruhan (0–35) terlebih dahulu";
+        lockHint.className = "text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1 rounded-full";
+      }
+
+      const bothVal = Math.max(0, Math.floor(Number(inputBoth.value) || 0));
+      const mistingVal = Math.max(0, Math.floor(Number(inputMisting.value) || 0));
+      const tumblerVal = Math.max(0, Math.floor(Number(inputTumbler.value) || 0));
+      const totalStudents = isTotalValid ? parsedTotal : 0;
+
+      const recorded = bothVal + mistingVal + tumblerVal;
+      const notBringing = Math.max(0, totalStudents - recorded);
+      const pct = totalStudents > 0 ? (bothVal / totalStudents) * 100 : 0;
+
+      document.getElementById("calcRecorded").textContent = recorded;
+      document.getElementById("calcNotBringing").textContent = notBringing;
+      document.getElementById("calcPercentage").textContent = formatPctComma(pct);
+
+      const isOverflow = isTotalValid && recorded > totalStudents;
+      warnBox.classList.toggle("hidden", !isOverflow);
+      if (isOverflow) {
+        document.getElementById("warnRecordedVal").textContent = recorded;
+        document.getElementById("warnTotalVal").textContent = totalStudents;
+      }
+      btnSave.disabled = !isTotalValid || isOverflow;
+    }
+
+    async function saveTeacherEntry() {
+      const classId = uiState.unlockedClassId;
+      if (!classId) return;
+      const classObj = CLASSES_DATA.find((c) => c.id === classId);
+      const dateVal = uiState.teacherDate;
+      const totalStudents = Number(document.getElementById("inputTotalStudents").value);
+      const both = Math.max(0, Math.floor(Number(document.getElementById("inputBoth").value) || 0));
+      const misting = Math.max(0, Math.floor(Number(document.getElementById("inputMisting").value) || 0));
+      const tumbler = Math.max(0, Math.floor(Number(document.getElementById("inputTumbler").value) || 0));
+
+      if (!Number.isInteger(totalStudents) || totalStudents < 0 || totalStudents > 35) {
+        showToast("⚠️ Jumlah anak keseluruhan harus antara 0 sampai 35.", "error");
+        return;
+      }
+      if (both + misting + tumbler > totalStudents) {
+        showToast("🚨 Jumlah tercatat melebihi jumlah anak keseluruhan!", "error");
+        return;
+      }
+
+      const recKey = `${dateVal}_${classId}`;
+      delete syncState.deletedEntries[recKey];
+      syncState.records[recKey] = {
+        date: dateVal,
+        classId,
+        teacher: classObj.teacher,
+        totalStudents,
+        both,
+        misting,
+        tumbler,
+        updatedAt: Date.now()
+      };
+
+      populateUnlockedTeacherForm();
+      renderTeacherView();
+      showToast(`✅ Data Kelas ${classId} berhasil disimpan & dikirim ke panitia!`, "success");
+      await pushToCloud("upsert");
+    }
+
+    async function deleteCurrentClassEntry() {
+      const classId = uiState.unlockedClassId;
+      if (!classId) return;
+      const dateVal = uiState.teacherDate;
+      const recKey = `${dateVal}_${classId}`;
+      if (!syncState.records[recKey]) return;
+
+      delete syncState.records[recKey];
+      syncState.deletedEntries[recKey] = Date.now();
+
+      populateUnlockedTeacherForm();
+      renderTeacherView();
+      showToast(`🗑️ Isian Kelas ${classId} pada ${formatDateID(dateVal)} telah dihapus.`, "warning");
+      await pushToCloud("delete");
+    }
+
+    function openHistoryModal() {
+      const classId = uiState.unlockedClassId;
+      if (!classId) return;
+      const classObj = CLASSES_DATA.find((c) => c.id === classId);
+      document.getElementById("historyModalTitle").textContent = `Riwayat Pengisian — Kelas ${classId}`;
+      document.getElementById("historyModalSubtitle").textContent = `Wali Kelas: ${classObj.teacher}`;
+
+      const entries = Object.values(syncState.records)
+        .filter((r) => r.classId === classId)
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      const tbody = document.getElementById("historyTableBody");
+      tbody.innerHTML = "";
+
+      if (entries.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500 font-medium">Belum ada riwayat pengisian tersimpan untuk Kelas ${classId}.</td></tr>`;
+      } else {
+        entries.forEach((r) => {
+          const pct = r.totalStudents > 0 ? (r.both / r.totalStudents) * 100 : 0;
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-50";
+          tr.innerHTML = `
+            <td class="py-2.5 px-3 font-bold text-slate-800">${formatDateID(r.date)}</td>
+            <td class="py-2.5 px-3 text-center font-semibold">${r.totalStudents}</td>
+            <td class="py-2.5 px-3 text-center font-extrabold text-emerald-700">${r.both}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-sky-700">${r.misting}</td>
+            <td class="py-2.5 px-3 text-center font-bold text-amber-700">${r.tumbler}</td>
+            <td class="py-2.5 px-3 text-right font-extrabold text-indigo-700">${formatPctComma(pct)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+      document.getElementById("historyModal").classList.remove("hidden");
+    }
+
+    function closeHistoryModal() {
+      document.getElementById("historyModal").classList.add("hidden");
+    }
+
+    function openAdminTokenModal() {
+      document.getElementById("adminTokenInput").value = "";
+      document.getElementById("adminTokenError").classList.add("hidden");
+      document.getElementById("adminTokenModal").classList.remove("hidden");
+      setTimeout(() => document.getElementById("adminTokenInput").focus(), 60);
+    }
+
+    function closeAdminTokenModal() {
+      document.getElementById("adminTokenModal").classList.add("hidden");
+    }
+
+    function submitAdminToken(event) {
+      event.preventDefault();
+      if (document.getElementById("adminTokenInput").value.trim() === ADMIN_TOKEN) {
+        uiState.isAdminAuthenticated = true;
+        closeAdminTokenModal();
+        switchMainView("admin");
+        showToast("🛡️ Berhasil masuk sebagai Admin Panitia.", "success");
+      } else {
+        document.getElementById("adminTokenError").classList.remove("hidden");
+      }
+    }
+
+    function logoutAdmin() {
+      uiState.isAdminAuthenticated = false;
+      switchMainView("teacher");
+      showToast("🚪 Keluar dari mode Admin Panitia.", "info");
+    }
+
+    function setAdminDefaultPeriod() {
+      uiState.adminPeriodFrom = DEFAULT_PERIOD_START;
+      uiState.adminPeriodTo = DEFAULT_PERIOD_END;
+      document.getElementById("adminPeriodFrom").value = DEFAULT_PERIOD_START;
+      document.getElementById("adminPeriodTo").value = DEFAULT_PERIOD_END;
+      renderAdminView();
+      showToast("🗓️ Periode diatur ke 23 Nov – 4 Des 2026.", "info");
+    }
+
+    function switchAdminTab(tabIndex) {
+      uiState.adminTab = tabIndex;
+      const btn1 = document.getElementById("adminTabBtn1");
+      const btn2 = document.getElementById("adminTabBtn2");
+      const content1 = document.getElementById("adminTabContent1");
+      const content2 = document.getElementById("adminTabContent2");
+
+      if (tabIndex === 1) {
+        btn1.className = "px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-extrabold border-b-2 border-indigo-600 bg-white text-indigo-700 shadow-sm transition";
+        btn2.className = "px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition";
+        content1.classList.remove("hidden");
+        content2.classList.add("hidden");
+      } else {
+        btn2.className = "px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-extrabold border-b-2 border-indigo-600 bg-white text-indigo-700 shadow-sm transition";
+        btn1.className = "px-4 py-2.5 rounded-t-xl text-xs sm:text-sm font-extrabold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition";
+        content2.classList.remove("hidden");
+        content1.classList.add("hidden");
+      }
+    }
+
+    function renderAdminView() {
+      if (!uiState.isAdminAuthenticated) return;
+      const dailyInput = document.getElementById("adminDailyDate");
+      if (!dailyInput.value) dailyInput.value = uiState.adminDailyDate;
+      uiState.adminDailyDate = dailyInput.value;
+      renderAdminKPIs();
+      renderAdminDailyTable();
+      renderAdminPeriodTable();
+    }
+
+    function renderAdminKPIs() {
+      const dailyDate = document.getElementById("adminDailyDate").value || getTodayISO();
+      const fromDate = document.getElementById("adminPeriodFrom").value || DEFAULT_PERIOD_START;
+      const toDate = document.getElementById("adminPeriodTo").value || DEFAULT_PERIOD_END;
+
+      let filledCount = 0;
+      let todayBoth = 0;
+      let todayMisting = 0;
+      let todayTumbler = 0;
+
+      CLASSES_DATA.forEach((cls) => {
+        const rec = syncState.records[`${dailyDate}_${cls.id}`];
+        if (rec) {
+          filledCount++;
+          todayBoth += Number(rec.both || 0);
+          todayMisting += Number(rec.misting || 0);
+          todayTumbler += Number(rec.tumbler || 0);
+        }
+      });
+
+      document.getElementById("kpiClassesFilled").textContent = `${filledCount} / 31`;
+      document.getElementById("kpiClassesDateLabel").textContent = `Tanggal: ${formatDateID(dailyDate)}`;
+      document.getElementById("kpiTodayBoth").textContent = `${todayBoth} Siswa`;
+      document.getElementById("kpiTodayPartial").textContent = `${todayMisting} / ${todayTumbler}`;
+
+      let periodTotalStudents = 0;
+      let periodTotalBoth = 0;
+      Object.values(syncState.records).forEach((rec) => {
+        if (rec.date >= fromDate && rec.date <= toDate) {
+          periodTotalStudents += Number(rec.totalStudents || 0);
+          periodTotalBoth += Number(rec.both || 0);
+        }
+      });
+
+      const periodPct = periodTotalStudents > 0 ? (periodTotalBoth / periodTotalStudents) * 100 : 0;
+      document.getElementById("kpiPeriodPct").textContent = formatPctComma(periodPct);
+      document.getElementById("kpiPeriodRangeLabel").textContent = `${fromDate} s.d. ${toDate}`;
+    }
+
+    function renderAdminDailyTable() {
+      const dailyDate = document.getElementById("adminDailyDate").value || getTodayISO();
+      uiState.adminDailyDate = dailyDate;
+      const statusFilter = document.getElementById("adminDailyStatusFilter").value;
+      renderAdminKPIs();
+
+      const tbody = document.getElementById("adminDailyTableBody");
+      tbody.innerHTML = "";
+
+      let rowsShown = 0;
+      CLASSES_DATA.forEach((cls) => {
+        const rec = syncState.records[`${dailyDate}_${cls.id}`];
+        const isFilled = Boolean(rec);
+        if (statusFilter === "filled" && !isFilled) return;
+        if (statusFilter === "unfilled" && isFilled) return;
+
+        rowsShown++;
+        const tr = document.createElement("tr");
+        tr.className = isFilled ? "hover:bg-emerald-50/40" : "hover:bg-slate-50 bg-slate-50/30";
+
+        if (isFilled) {
+          const pct = rec.totalStudents > 0 ? (rec.both / rec.totalStudents) * 100 : 0;
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-extrabold text-slate-900">${cls.id}</td>
+            <td class="py-3 px-4 font-medium text-slate-700">${cls.teacher}</td>
+            <td class="py-3 px-4"><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">✅ Sudah Mengisi</span></td>
+            <td class="py-3 px-4 text-center font-bold text-slate-800">${rec.totalStudents}</td>
+            <td class="py-3 px-4 text-center font-extrabold text-emerald-700">${rec.both}</td>
+            <td class="py-3 px-4 text-center font-bold text-sky-700">${rec.misting}</td>
+            <td class="py-3 px-4 text-center font-bold text-amber-700">${rec.tumbler}</td>
+            <td class="py-3 px-4 text-right font-extrabold text-indigo-700">${formatPctComma(pct)}</td>
+          `;
+        } else {
+          tr.innerHTML = `
+            <td class="py-3 px-4 font-extrabold text-slate-700">${cls.id}</td>
+            <td class="py-3 px-4 text-slate-500">${cls.teacher}</td>
+            <td class="py-3 px-4"><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-700">⏳ Belum Mengisi</span></td>
+            <td class="py-3 px-4 text-center text-slate-400">-</td>
+            <td class="py-3 px-4 text-center text-slate-400">-</td>
+            <td class="py-3 px-4 text-center text-slate-400">-</td>
+            <td class="py-3 px-4 text-center text-slate-400">-</td>
+            <td class="py-3 px-4 text-right text-slate-400">-</td>
+          `;
+        }
+        tbody.appendChild(tr);
+      });
+
+      if (rowsShown === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 font-semibold">Tidak ada kelas yang sesuai dengan filter status terpilih.</td></tr>`;
+      }
+    }
+
+    function computePeriodRanking(fromDate, toDate) {
+      const results = CLASSES_DATA.map((cls) => {
+        let daysReported = 0;
+        let totalStudents = 0;
+        let totalBoth = 0;
+        let totalMisting = 0;
+        let totalTumbler = 0;
+
+        Object.values(syncState.records).forEach((rec) => {
+          if (rec.classId === cls.id && rec.date >= fromDate && rec.date <= toDate) {
+            daysReported++;
+            totalStudents += Number(rec.totalStudents || 0);
+            totalBoth += Number(rec.both || 0);
+            totalMisting += Number(rec.misting || 0);
+            totalTumbler += Number(rec.tumbler || 0);
+          }
+        });
+
+        const pct = totalStudents > 0 ? (totalBoth / totalStudents) * 100 : 0;
+        return { ...cls, daysReported, totalStudents, totalBoth, totalMisting, totalTumbler, pct };
+      });
+
+      results.sort((a, b) => {
+        if (b.pct !== a.pct) return b.pct - a.pct;
+        if (b.totalBoth !== a.totalBoth) return b.totalBoth - a.totalBoth;
+        if (b.daysReported !== a.daysReported) return b.daysReported - a.daysReported;
+        return a.id.localeCompare(b.id);
+      });
+      return results;
+    }
+
+    function renderAdminPeriodTable() {
+      const fromDate = document.getElementById("adminPeriodFrom").value || DEFAULT_PERIOD_START;
+      const toDate = document.getElementById("adminPeriodTo").value || DEFAULT_PERIOD_END;
+      uiState.adminPeriodFrom = fromDate;
+      uiState.adminPeriodTo = toDate;
+      renderAdminKPIs();
+
+      const ranking = computePeriodRanking(fromDate, toDate);
+      const tbody = document.getElementById("adminPeriodTableBody");
+      tbody.innerHTML = "";
+
+      ranking.forEach((row, index) => {
+        const rankNum = index + 1;
+        let rankDisplay = `<span class="font-extrabold text-slate-600">#${rankNum}</span>`;
+        let rowBg = "hover:bg-slate-50";
+
+        if (row.daysReported > 0) {
+          if (rankNum === 1) {
+            rankDisplay = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300">🥇 #1</span>`;
+            rowBg = "bg-amber-50/35 hover:bg-amber-50/60";
+          } else if (rankNum === 2) {
+            rankDisplay = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-slate-200 text-slate-800 border border-slate-300">🥈 #2</span>`;
+            rowBg = "bg-slate-50/60 hover:bg-slate-100/60";
+          } else if (rankNum === 3) {
+            rankDisplay = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-orange-100 text-orange-800 border border-orange-300">🥉 #3</span>`;
+            rowBg = "bg-orange-50/30 hover:bg-orange-50/60";
+          }
+        }
+
+        const tr = document.createElement("tr");
+        tr.className = rowBg;
+        tr.innerHTML = `
+          <td class="py-3 px-4 text-center">${rankDisplay}</td>
+          <td class="py-3 px-4 font-extrabold text-slate-900">${row.id}</td>
+          <td class="py-3 px-4 font-medium text-slate-700">${row.teacher}</td>
+          <td class="py-3 px-4 text-center"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${row.daysReported > 0 ? "bg-indigo-100 text-indigo-800" : "bg-slate-100 text-slate-500"}">${row.daysReported} Hari</span></td>
+          <td class="py-3 px-4 text-center font-extrabold text-emerald-700">${row.totalBoth}</td>
+          <td class="py-3 px-4 text-center font-bold text-sky-700">${row.totalMisting}</td>
+          <td class="py-3 px-4 text-center font-bold text-amber-700">${row.totalTumbler}</td>
+          <td class="py-3 px-4 text-right font-extrabold text-indigo-700 text-base">${formatPctComma(row.pct)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportAdminCSV() {
+      const fromDate = document.getElementById("adminPeriodFrom").value || DEFAULT_PERIOD_START;
+      const toDate = document.getElementById("adminPeriodTo").value || DEFAULT_PERIOD_END;
+      const ranking = computePeriodRanking(fromDate, toDate);
+
+      const lines = [
+        "REKAPITULASI MISTING & TUMBLER SISWA - SDN 190 CISARANTEN KIDUL",
+        `Periode;${fromDate} s.d. ${toDate}`,
+        "",
+        "Peringkat;Kelas;Wali Kelas;Hari Lapor;Total Siswa Akumulasi;Total Misting & Tumbler;Total Misting;Total Tumbler;Persentase Lengkap"
+      ];
+
+      ranking.forEach((r, idx) => {
+        const cleanTeacher = `"${r.teacher.replace(/"/g, '""')}"`;
+        lines.push([idx + 1, r.id, cleanTeacher, r.daysReported, r.totalStudents, r.totalBoth, r.totalMisting, r.totalTumbler, formatPctComma(r.pct)].join(";"));
+      });
+
+      lines.push("", "RINCIAN DATA HARIAN TERSIMPAN", "Tanggal;Kelas;Wali Kelas;Jumlah Siswa;Misting & Tumbler;Misting;Tumbler;Jumlah Tercatat;Tidak Membawa;Persentase Lengkap");
+
+      Object.values(syncState.records)
+        .filter((rec) => rec.date >= fromDate && rec.date <= toDate)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.classId.localeCompare(b.classId))
+        .forEach((rec) => {
+          const clsObj = CLASSES_DATA.find((c) => c.id === rec.classId);
+          const teacherName = clsObj ? clsObj.teacher : (rec.teacher || "");
+          const recorded = rec.both + rec.misting + rec.tumbler;
+          const notBringing = Math.max(0, rec.totalStudents - recorded);
+          const pct = rec.totalStudents > 0 ? (rec.both / rec.totalStudents) * 100 : 0;
+          lines.push([rec.date, rec.classId, `"${teacherName.replace(/"/g, '""')}"`, rec.totalStudents, rec.both, rec.misting, rec.tumbler, recorded, notBringing, formatPctComma(pct)].join(";"));
+        });
+
+      const csvContent = "\uFEFF" + lines.join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Rekap-Misting-Tumbler-SDN190_${fromDate}_sd_${toDate}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("📥 File CSV berhasil diunduh (BOM UTF-8 & pemisah titik koma).", "success");
+    }
+
+    function resetAdminSelectedDate() {
+      const targetDate = document.getElementById("adminDailyDate").value || getTodayISO();
+      document.getElementById("resetModalTitle").textContent = `Reset Data Tanggal ${formatDateID(targetDate)}?`;
+      document.getElementById("resetModalDesc").textContent = `Seluruh rekapan dari 31 kelas khusus pada tanggal ${formatDateID(targetDate)} akan dihapus secara permanen dan disinkronkan ke cloud.`;
+
+      document.getElementById("btnConfirmResetAction").onclick = async () => {
+        closeResetConfirmModal();
+        const now = Date.now();
+        Object.keys(syncState.records).forEach((key) => {
+          if (syncState.records[key].date === targetDate) {
+            delete syncState.records[key];
+            syncState.deletedEntries[key] = now;
+          }
+        });
+        refreshAllViews();
+        showToast(`🗑️ Data tanggal ${formatDateID(targetDate)} berhasil direset.`, "warning");
+        await pushToCloud("reset_date");
+      };
+
+      document.getElementById("resetConfirmModal").classList.remove("hidden");
+    }
+
+    function openResetAllModal() {
+      document.getElementById("resetModalTitle").textContent = "Reset Seluruh Hasil Rekapan Guru?";
+      document.getElementById("resetModalDesc").textContent = "PERINGATAN: Semua data rekapan dari seluruh tanggal dan 31 kelas di ruang ini akan dihapus bersih. Data lama tidak akan muncul kembali.";
+
+      document.getElementById("btnConfirmResetAction").onclick = async () => {
+        closeResetConfirmModal();
+        syncState.records = {};
+        syncState.deletedEntries = {};
+        syncState.resetAt = Date.now();
+        syncState.updatedAt = syncState.resetAt;
+        refreshAllViews();
+        showToast("⚠️ Seluruh hasil rekapan guru telah direset bersih!", "warning");
+        await pushToCloud("reset_all");
+      };
+
+      document.getElementById("resetConfirmModal").classList.remove("hidden");
+    }
+
+    function closeResetConfirmModal() {
+      document.getElementById("resetConfirmModal").classList.add("hidden");
+    }
+
+    async function manualReloadSync() {
+      loadLocalState();
+      await pullFromCloud(false);
+      refreshAllViews();
+      showToast("🔄 Data berhasil dimuat ulang.", "info");
+    }
+
+    function openCloudModal() {
+      document.getElementById("cloudRoomInput").value = appConfig.room;
+      document.getElementById("cloudGasUrlInput").value = appConfig.gasUrl;
+      document.getElementById("gasCodeBlock").textContent = GAS_CODE_TEMPLATE;
+      updateShareableLinkPreview();
+      document.getElementById("cloudModal").classList.remove("hidden");
+    }
+
+    function closeCloudModal() {
+      document.getElementById("cloudModal").classList.add("hidden");
+    }
+
+    function buildShareableUrl() {
+      const roomVal = (document.getElementById("cloudRoomInput").value || DEFAULT_ROOM).trim();
+      const gasVal = (document.getElementById("cloudGasUrlInput").value || "").trim();
+      const url = new URL(window.location.href.split("?")[0]);
+      url.searchParams.set("room", roomVal);
+      if (gasVal) url.searchParams.set("gas", gasVal);
+      return url.toString();
+    }
+
+    function updateShareableLinkPreview() {
+      document.getElementById("shareableLinkPreview").value = buildShareableUrl();
+    }
+
+    function copyShareableLink() {
+      const link = buildShareableUrl();
+      navigator.clipboard.writeText(link).then(() => {
+        showToast("📋 Link siap sebar berhasil disalin ke clipboard!", "success");
+      }).catch(() => {
+        const input = document.getElementById("shareableLinkPreview");
+        input.select();
+        document.execCommand("copy");
+        showToast("📋 Link siap sebar berhasil disalin!", "success");
+      });
+    }
+
+    function copyGasScript() {
+      navigator.clipboard.writeText(GAS_CODE_TEMPLATE).then(() => {
+        showToast("📜 Kode Google Apps Script (Code.gs) berhasil disalin!", "success");
+      }).catch(() => {
+        showToast("Silakan blok dan salin kode dari kotak script.", "info");
+      });
+    }
+
+    async function saveCloudSettings() {
+      const newRoom = (document.getElementById("cloudRoomInput").value || DEFAULT_ROOM).trim();
+      const newGas = (document.getElementById("cloudGasUrlInput").value || "").trim();
+
+      appConfig.room = newRoom;
+      appConfig.gasUrl = newGas;
+      localStorage.setItem("sdn190_misting_config", JSON.stringify(appConfig));
+      document.getElementById("headerRoomLabel").textContent = appConfig.room;
+
+      window.history.replaceState({}, "", buildShareableUrl());
+      loadLocalState();
+      setupBroadcastChannel();
+      closeCloudModal();
+
+      await pullFromCloud(false);
+      if (appConfig.gasUrl) await pushToCloud("sync_handshake");
+      refreshAllViews();
+      showToast(`☁️ Pengaturan ruang "${appConfig.room}" disimpan!`, "success");
+    }
+
+    function refreshAllViews() {
+      renderTeacherView();
+      if (uiState.isAdminAuthenticated) renderAdminView();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      initConfigFromUrlAndStorage();
+      loadLocalState();
+      setupBroadcastChannel();
+
+      const teacherDateEl = document.getElementById("teacherDateInput");
+      teacherDateEl.value = uiState.teacherDate;
+      teacherDateEl.addEventListener("change", (e) => {
+        uiState.teacherDate = e.target.value || getTodayISO();
+        renderTeacherView();
+      });
+
+      document.getElementById("cloudRoomInput").addEventListener("input", updateShareableLinkPreview);
+      document.getElementById("cloudGasUrlInput").addEventListener("input", updateShareableLinkPreview);
+
+      window.addEventListener("storage", (e) => {
+        if (e.key === getStorageKey() && e.newValue) {
+          try {
+            const parsed = JSON.parse(e.newValue);
+            if (mergeRemoteState(parsed)) refreshAllViews();
+          } catch (err) {}
+        }
+      });
+
+      renderTeacherView();
+      startPolling();
+      if (appConfig.gasUrl) await pullFromCloud(true);
+    });
+  </script>
+</body>
+</html>
